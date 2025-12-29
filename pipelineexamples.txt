@@ -1,0 +1,139 @@
+Test caseS:
+
+pipeline {
+    agent any
+
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven "M3"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                // Get some code from a GitHub repository
+                git 'https://github.com/jglick/simple-maven-project-with-tests.git'
+
+                // Run Maven on a Unix agent.
+                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+
+                // To run Maven on a Windows agent, use
+                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+
+            post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'target/*.jar'
+                }
+            }
+        }
+    }
+}
+
+
+Approval Based: 
+
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+            }
+        }
+        stage('Production Approval') {
+            steps {
+                // This pauses the pipeline and waits for a user click
+                input message: 'Deploy to Production?', ok: 'Yes, go!'
+            }
+        }
+        stage('Deploy to Prod') {
+            steps {
+                echo 'Deploying to production servers...'
+            }
+        }
+    }
+}
+
+
+Matrix Builds:
+pipeline {
+    agent any
+    stages {
+        stage('Matrix Test') {
+            matrix {
+                axes {
+                    axis {
+                        name 'PYTHON_VERSION'
+                        values '3.8', '3.9', '3.10'
+                    }
+                }
+                stages {
+                    stage('Test') {
+                        steps {
+                            echo "Testing against Python ${PYTHON_VERSION}"
+                            // sh "python${PYTHON_VERSION} -m pytest"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+Error Handling & Notifications:
+pipeline {
+    agent any
+    stages {
+        stage('Critical Build') {
+            steps {
+                sh 'exit 1' // This simulates a failure
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+            // slackSend channel: '#ops', message: "SUCCESS: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+        }
+        failure {
+            echo 'Pipeline failed! Sending alerts...'
+            mail to: 'dev-team@example.com',
+                 subject: "Failed Pipeline: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                 body: "Check the logs at ${env.BUILD_URL}"
+        }
+    }
+}
+
+
+Multi-Branch & Conditional Deployment:
+pipeline {
+    agent any
+    stages {
+        stage('Build & Test') {
+            steps {
+                echo 'Running global checks...'
+            }
+        }
+        stage('Deploy to Staging') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                echo 'Deploying to Staging environment...'
+            }
+        }
+        stage('Release to Production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo 'Deploying to Production environment...'
+            }
+        }
+    }
+}
