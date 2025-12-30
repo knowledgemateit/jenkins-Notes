@@ -1,4 +1,4 @@
-# jenkinsapprovalpipeline
+Jenkins Installation on Ubuntu
 
 sudo apt install fontconfig openjdk-17-jre -y
 
@@ -20,7 +20,7 @@ sudo systemctl start jenkins
 
 sudo systemctl status jenkins
 
-Terraform 
+Terraform Installation on Ubuntu
 
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 
