@@ -1,4 +1,4 @@
-
+Jenkins:
 sudo dnf update -y
 sudo dnf install java-17-amazon-corretto -y
 sudo dnf remove java-17-amazon-corretto -y
