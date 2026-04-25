@@ -22,3 +22,22 @@ Terraform installation:
 sudo dnf install -y yum-utils
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 sudo dnf install -y terraform
+
+
+Temp folder issue fix:
+# 1. Create the override directory
+sudo mkdir -p /etc/systemd/system/jenkins.service.d/
+
+# 2. Write the configuration to the override file
+sudo tee /etc/systemd/system/jenkins.service.d/override.conf <<EOF
+[Service]
+Environment="JAVA_OPTS=-Djenkins.model.Nodes.minSpaceThreshold=104857600 -Djava.io.tmpdir=/var/lib/jenkins/tmp"
+EOF
+
+# 3. Create the new temp directory and give Jenkins permission
+sudo mkdir -p /var/lib/jenkins/tmp
+sudo chown -R jenkins:jenkins /var/lib/jenkins/tmp
+
+# 4. Reload systemd and restart Jenkins
+sudo systemctl daemon-reload
+sudo systemctl restart jenkins
