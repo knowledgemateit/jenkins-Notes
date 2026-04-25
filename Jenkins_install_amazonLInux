@@ -16,13 +16,18 @@ sudo systemctl daemon-reload
 sudo systemctl reset-failed jenkins
 sudo systemctl start jenkins
 
-
+----------------------------
 
 Terraform installation:
 sudo dnf install -y yum-utils
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 sudo dnf install -y terraform
-
+----------------------------
+Docker installation:
+sudo dnf install docker -y
+sudo systemctl start docker
+sudo systemctl enable docker
+----------------------------
 
 Temp folder issue fix:
 # 1. Create the override directory
@@ -41,3 +46,7 @@ sudo chown -R jenkins:jenkins /var/lib/jenkins/tmp
 # 4. Reload systemd and restart Jenkins
 sudo systemctl daemon-reload
 sudo systemctl restart jenkins
+
+----------------------------------
+
+
