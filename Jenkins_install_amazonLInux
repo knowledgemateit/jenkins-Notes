@@ -37,6 +37,7 @@ sudo mkdir -p /etc/systemd/system/jenkins.service.d/
 sudo tee /etc/systemd/system/jenkins.service.d/override.conf <<EOF
 [Service]
 Environment="JAVA_OPTS=-Djenkins.model.Nodes.minSpaceThreshold=104857600 -Djava.io.tmpdir=/var/lib/jenkins/tmp"
+Environment="JENKINS_PORT=8090"
 EOF
 
 # 3. Create the new temp directory and give Jenkins permission
