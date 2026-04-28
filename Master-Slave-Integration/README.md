@@ -4,13 +4,13 @@ This guide details the architectural setup for a Distributed Jenkins Environment
 ## 🏗️ Architecture at a Glance
 Jenkins Master: Handles Orchestration, UI, and Security.
 
-Jenkins Slave (172.31.47.211): Handles Maven builds and Java compilation.
+Jenkins Slave (172.31.47.211): Dedicated execution environment for Maven builds and Java compilation.
 
 Protocol: Secured via SSH (RSA 4096-bit) key-based authentication.
 
 ## 📂 Setup Phases
 ### Phase 1: Key Generation (Master Node)
-Log into your Master instance as the jenkins user to create the "ID card" for the agent.
+Log into your Master instance as the jenkins user to create the "Identity" for the agent connection.
 
 Generate the PEM Key:
 
@@ -25,9 +25,9 @@ cat ~/.ssh/id_rsa_jenkins.pub
 Copy the entire string (starting with ssh-rsa) to your clipboard.
 
 ### Phase 2: Agent Preparation (Slave Node)
-Log into your Slave instance (172.31.47.211) to prepare the environment.
+Log into your Slave instance (172.31.47.211) to prepare the environment for work.
 
-User & SSH Setup:
+User & SSH Configuration:
 
 Bash
 
@@ -36,7 +36,7 @@ sudo su - jenkins
 mkdir -p ~/.ssh && chmod 700 ~/.ssh
 echo "PASTE_PUBLIC_KEY_HERE" >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
-Install Toolchain:
+Install the Toolchain:
 
 Bash
 
@@ -48,21 +48,29 @@ Kind: SSH Username with private key
 
 ID: slave-ssh-key
 
-Private Key: Paste the content of ~/.ssh/id_rsa_jenkins (from the Master).
+Username: jenkins
+
+Private Key: Paste the content of ~/.ssh/id_rsa_jenkins from the Master.
 
 Create the Node: Manage Jenkins > Nodes > New Node
 
-Name: Slave-01 | Remote root: /home/jenkins
+Name: Slave-01
+
+Remote root directory: /home/jenkins
 
 Launch Method: Launch agents via SSH
 
-Host: 172.31.47.211 | Credentials: slave-ssh-key
+Host: 172.31.47.211
 
-Verification: Non-verifying Verification Strategy.
+Credentials: slave-ssh-key
 
-SRE Optimization (Crucial for T2.Micro): Go to Nodes > Configure Monitors.
+Host Key Verification: Non-verifying Verification Strategy.
 
-Change Free Disk Space and Free Temp Space thresholds from 1GiB to 200MiB.
+SRE Optimization (Crucial for t2.micro/Small Disks):
+
+Navigate to Nodes > Configure Monitors.
+
+Change Free Disk Space and Free Temp Space thresholds from 1GiB to 200MiB. This prevents Jenkins from marking the node as "Offline" due to low disk space common in cloud environments.
 
 ### 🚀 Validation Pipeline
 Use the following declarative pipeline to verify that the Slave is correctly assuming the build workload.
