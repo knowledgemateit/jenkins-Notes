@@ -83,6 +83,13 @@ Navigate to Nodes > Configure Monitors.
 
 Change Free Disk Space and Free Temp Space thresholds from 1GiB to 200MiB. This prevents Jenkins from marking the node as "Offline" due to low disk space common in cloud environments.
 
+mkdir /home/jenkins/tmp
+
+sudo chown jenkins:jenkins /home/jenkins/tmp
+
+chmod 755 /home/jenkins/tmp
+
+
 ### 🚀 Validation Pipeline
 Use the following declarative pipeline to verify that the Slave is correctly assuming the build workload.
 
