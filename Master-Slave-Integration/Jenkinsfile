@@ -1,0 +1,24 @@
+pipeline {
+    // This tells Jenkins to ONLY run this job on your new slave
+    agent { label 'Slave-01' } 
+
+    stages {
+        stage('Identify Environment') {
+            steps {
+                echo "Running on Node: ${env.NODE_NAME}"
+                // These commands prove we are on the Linux agent
+                sh 'hostname'
+                sh 'uptime'
+            }
+        }
+
+        stage('Check Build Tools') {
+            steps {
+                echo 'Checking if Java and Maven are ready...'
+                sh 'java -version'
+                // This will fail if Step 1 (installing maven) wasn't done
+                sh 'mvn -version' 
+            }
+        }
+    }
+}
