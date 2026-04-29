@@ -77,6 +77,9 @@ Credentials: slave-ssh-key
 
 Host Key Verification: Non-verifying Verification Strategy.
 
+JVM settings: -Djava.io.tmpdir=/home/jenkins/tmp
+
+
 SRE Optimization (Crucial for t2.micro/Small Disks):
 
 Navigate to Nodes > Configure Monitors.
