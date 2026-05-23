@@ -1,0 +1,29 @@
+# 1. Java 21 (current Jenkins LTS requires it)
+sudo apt-get update -y
+sudo apt-get install -y openjdk-21-jdk fontconfig curl gnupg
+java -version
+
+# 2. Add Jenkins apt repo with the current signing key (fetched over HTTPS, no dirmngr needed)
+sudo rm -f /usr/share/keyrings/jenkins-keyring.gpg /usr/share/keyrings/jenkins-keyring.asc
+sudo rm -f /etc/apt/sources.list.d/jenkins.list
+
+curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x7198F4B714ABFC68" \
+  | sudo gpg --dearmor -o /usr/share/keyrings/jenkins-keyring.gpg
+sudo chmod a+r /usr/share/keyrings/jenkins-keyring.gpg
+
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/" \
+  | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+# 3. Install Jenkins
+sudo apt-get update -y
+sudo apt-get install -y jenkins
+
+# 4. Make sure java in PATH points to 21 (Jenkins reads /etc/alternatives/java)
+sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+
+# 5. Start it
+sudo systemctl daemon-reload
+sudo systemctl reset-failed jenkins
+sudo systemctl enable --now jenkins
+sleep 5
+systemctl status jenkins --no-pager
